@@ -1,0 +1,33 @@
+name: Build APK Boss
+on:
+  repository_dispatch:
+    types: [build_apk]
+  workflow_dispatch:
+    inputs:
+      url:
+        description: 'Website URL'
+        required: true
+        default: 'https://google.com'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+      - name: Build Dummy APK
+        run: |
+          echo "Building for ${{ github.event.client_payload.url }}"
+          mkdir -p app/build/outputs/apk/release/
+          echo "APK Dummy for ${{ github.event.client_payload.url }}" > app/build/outputs/apk/release/BOSS.apk
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: BOSS-APK
+          path: app/build/outputs/apk/release/*.apk
